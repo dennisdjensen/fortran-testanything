@@ -2,20 +2,23 @@
 FC=gfortran
 
 # Debug:
-FFLAGS=-g -Wall -Wextra -std=f2008ts
+FFLAGS=-g -fbacktrace -Wall -Wextra -std=f2008ts
 # Release, not recommended:
 #FFLAGS=-Ofast -Wall -Wextra -std=f2008ts
 
 # prove(1) from Perl5:
-TESTHARNESS=prove
+#TESTHARNESS=prove
 # Fortran test harness to run tests:
-#TESTHARNESS=runtests
+TESTHARNESS=./runtests
 
 test_examples:
 	$(FC) $(FFLAGS) -o test_examples test.f08 test_examples.f08
 
-check:
-	$(TESTHARNESS) ./test_examples
+runtests: runtests.f08
+	$(FC) $(FFLAGS) -o runtests runtests.f08
+
+check: runtests
+	$(TESTHARNESS) test_examples
 
 clean:
 	rm -f test.o
