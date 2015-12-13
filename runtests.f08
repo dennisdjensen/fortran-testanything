@@ -6,15 +6,19 @@ program runtests
    integer total_tests, total_skipped
    integer total_todos, total_unexptodos
    integer total_planned, total_failed
-   integer ntests, nskipped, ntodos, nunexptodos, nplanned, nfailed
+   integer ntests, nskipped, ntodos, nunexptodos, nplanned, nfailed, nfiles
+   real t1, t2, time
 
-   ! TODO: (1) Collect testprograms, and line them up nicely with dots;
-   !       (2) Provide timing with system clock (milliseconds);
-   !       (3) Show number of files
+   ! TODO: (1) Collect test program names, and line them up nicely with dots;
+   !       (2) Read test stream from input_unit by default on 0 arguments;
+   !       (3) Show tests or other options?
 
    total_tests = 0; total_todos = 0; total_unexptodos = 0;
    total_skipped = 0; total_planned = 0; total_failed = 0
-   do i = 1, command_argument_count()
+   time = 0.0
+   nfiles = command_argument_count()
+   call cpu_time(t1)
+   do i = 1, nfiles
       call get_command_argument(i, testprogram, &
                               & length=arglen, status=argstatus)
       if (argstatus /= 0) then
@@ -34,6 +38,8 @@ program runtests
       end if
       call runtest(testprogram)
    end do
+   call cpu_time(t2)
+   time = t2 - t1
 
    ! Delete all test output
    call execute_command_line("del *.testoutput")   ! DOS
@@ -41,15 +47,17 @@ program runtests
    ! ...
 
    write (*, '("--------------------------------------------------")')
-   write (*, '("      Planned: ",I0," (ran ",I0,")")') &
+   write (*, '("      Files:    ",I0)') nfiles
+   write (*, '("      Planned:  ",I0," (ran ",I0,")")') &
          & total_planned, total_tests
-   write (*, '("      Skipped: ",I0)') total_skipped
-   write (*, '("      Todos: ",I0," (",I0," unexpectedly passed)")') &
+   write (*, '("      Skipped:  ",I0)') total_skipped
+   write (*, '("      Todos:    ",I0," (",I0," unexpectedly passed)")') &
          & total_todos, total_unexptodos
-   write (*, '("      Failed: ",I0)') total_failed
-   write (*, '("      OK tests (",I0," - ", I0, " - ", I0, "): ",I0)') &
-         & total_tests, total_failed, total_skipped, &
-         & total_tests - total_failed - total_skipped 
+   write (*, '("      Failed:   ",I0)') total_failed
+   write (*, '("      OK tests: ",I0," (",I0," - ", I0, " - ", I0, ")")') &
+         & total_tests - total_failed - total_skipped, & 
+         & total_tests, total_failed, total_skipped
+   write (*, '("      Time:     ",G0," seconds")') time
    write (*, '("--------------------------------------------------")')
 
    if (total_failed > 0) then
@@ -83,10 +91,13 @@ contains
    subroutine analyze(testprogram, testoutput)
       character(len=*), intent(in) :: testprogram, testoutput
       character(len=200) testline
+      character(len=30) testprogram_dots
       character(len=:), allocatable :: msg
       integer stat
 
-      write (*, '(A, ": ")', advance="NO") testprogram
+      testprogram_dots = repeat(".", len(testprogram_dots))
+      testprogram_dots(1:min(len(testprogram), 30)) = testprogram
+      write (*, '(A, ": ")', advance="NO") testprogram_dots
 
       ntests = 0; ntodos = 0; nunexptodos = 0
       nskipped = 0; nplanned = 0; nfailed = 0
@@ -168,7 +179,6 @@ contains
       else if (testline(:3) == "1..") then
          if (nplanned > 0) then
             msg = "Double plan!"
-            !print *, "==> ", nplanned, testline
             return
          end if
          read (testline(4:), *) nplanned

@@ -7,7 +7,7 @@ FFLAGS=-g -fbacktrace -Wall -Wextra -std=f2008ts
 #FFLAGS=-Ofast -Wall -Wextra -std=f2008ts
 
 # prove(1) from Perl5:
-#TESTHARNESS=prove
+#TESTHARNESS=prove -e ''
 # Fortran test harness to run tests:
 TESTHARNESS=./runtests
 
@@ -17,8 +17,8 @@ test_examples:
 runtests: runtests.f08
 	$(FC) $(FFLAGS) -o runtests runtests.f08
 
-check: runtests
-	$(TESTHARNESS) test_examples
+check: test_examples runtests
+	$(TESTHARNESS) ./test_examples
 
 clean:
 	rm -f test.o
