@@ -2,7 +2,7 @@
 FC=gfortran
 
 # Debug:
-FFLAGS=-g -fbacktrace -Wall -Wextra -std=f2008ts
+FFLAGS=-g -fbacktrace -Wall -Wextra -std=f2008ts -fcheck=all -finit-real=nan
 # Release, not recommended:
 #FFLAGS=-Ofast -Wall -Wextra -std=f2008ts
 
@@ -12,9 +12,11 @@ FFLAGS=-g -fbacktrace -Wall -Wextra -std=f2008ts
 TESTHARNESS=bin/runtests
 
 bin/test_examples:
+	mkdir -p
 	$(FC) $(FFLAGS) -o bin/test_examples test.f08 test_examples.f08
 
 bin/runtests: runtests.f08
+	mkdir -p
 	$(FC) $(FFLAGS) -o bin/runtests runtests.f08
 
 check: bin/test_examples bin/runtests
