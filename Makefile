@@ -12,11 +12,11 @@ FFLAGS=-g -fbacktrace -Wall -Wextra -std=f2008ts -fcheck=all -finit-real=nan
 TESTHARNESS=bin/runtests
 
 bin/test_examples:
-	mkdir -p
+	mkdir -p bin
 	$(FC) $(FFLAGS) -o bin/test_examples test.f08 test_examples.f08
 
 bin/runtests: runtests.f08
-	mkdir -p
+	mkdir -p bin
 	$(FC) $(FFLAGS) -o bin/runtests runtests.f08
 
 check: bin/test_examples bin/runtests
