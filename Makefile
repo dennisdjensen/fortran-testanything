@@ -19,7 +19,7 @@ bin/runtests: runtests.f08
 	mkdir -p bin
 	$(FC) $(FFLAGS) -o bin/runtests runtests.f08
 
-check: bin/test_examples bin/runtests
+examples: bin/test_examples bin/runtests
 	$(TESTHARNESS) bin/test_examples
 
 clean:
