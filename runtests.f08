@@ -41,11 +41,6 @@ program runtests
    call cpu_time(t2)
    time = t2 - t1
 
-   ! Delete all test output
-   call execute_command_line("del *.testoutput")   ! DOS
-   call execute_command_line("rm -f *.testoutput") ! UNIX
-   ! ...
-
    write (*, '("--------------------------------------------------")')
    write (*, '("      Files:    ",I0)') nfiles
    write (*, '("      Planned:  ",I0," (ran ",I0,")")') &
@@ -105,7 +100,7 @@ contains
       open(10, file=testoutput, status='OLD', iostat=stat, iomsg=msg)
       if (stat /= 0) then
          write (*, *) "ERROR! ", msg
-         close(10)
+         close(10, status='DELETE')
          return
       end if
 
@@ -120,7 +115,7 @@ contains
          if (msg /= "") exit ! Early exit, e.g. no plan
       end do 
 
-      close(10)
+      close(10, status='DELETE')
 
       if (msg /= "") then
          write (*, *) msg
